@@ -98,21 +98,10 @@ def metodo_secante(func, x0, x1, tol):
 
 
 def metodo_newton_raphson(func, dfunc, x0, tol):
-    """
-    Método de Newton-Raphson para encontrar las raíces de una función continua.
-    
-    Parámetros:
-    func: La función para la cual estamos buscando la raíz.
-    dfunc: La derivada de la función.
-    x0: Aproximación inicial.
-    tol: Tolerancia para el criterio de convergencia.
-    
-    Retorna:
-    Una aproximación de la raíz de la función.
-    """
     iteraciones = 0
     errores_e_iteraciones = []
-    error_actual =  100
+    error_actual = 100
+    x_prev = x0
 
     while error_actual >= tol:
         if abs(dfunc(x0)) < 1e-15:  # Evitar división por cero
@@ -121,17 +110,19 @@ def metodo_newton_raphson(func, dfunc, x0, tol):
         
         x1 = x0 - func(x0) / dfunc(x0)
 
-        error_actual = abs((x1 - x0) / x1)
+        error_actual = abs(x1 - x_prev) / abs(x1)  # Calcular el error relativo
         errores_e_iteraciones.append((iteraciones, error_actual))
 
+        x_prev = x1
         x0 = x1
+        iteraciones += 1
     
     # Graficar el progreso
     plt.plot([iteracion[0] for iteracion in errores_e_iteraciones], 
              [error[1] for error in errores_e_iteraciones], 
              marker='o', linestyle='-')
     plt.xlabel('Iteraciones')
-    plt.ylabel('Error')
+    plt.ylabel('Error relativo')
     plt.title('Progreso del método de Newton-Raphson')
     plt.grid(True)
     plt.tight_layout()
@@ -242,7 +233,7 @@ def graficar_newton_raphson(figure, data):
             [error[1] for error in data], 
             marker='o', linestyle='-')
     ax.set_xlabel('Iteraciones')
-    ax.set_ylabel('Error')
+    ax.set_ylabel('Error relativo')
     ax.set_title('Progreso del método de Newton-Raphson')
     ax.grid(True)
     ax.tight_layout()
@@ -301,6 +292,19 @@ calcular_button.grid(row=2, column=0, padx=10, pady=10)
 # Frame para la gráfica
 grafica_frame = ttk.LabelFrame(root, text="Gráfica")
 grafica_frame.grid(row=0, column=1, rowspan=3, padx=10, pady=10, sticky="nsew")
+
+# Crear una figura vacía
+figure = plt.figure(figsize=(6, 4))
+ax = figure.add_subplot(111)
+ax.set_xlabel('Iteraciones')
+ax.set_ylabel('Error')
+ax.set_title('Progreso del método')
+ax.grid(True)
+
+# Crear un lienzo para la figura
+canvas = FigureCanvasTkAgg(figure, master=grafica_frame)
+canvas_widget = canvas.get_tk_widget()
+canvas_widget.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
 
 # Resultado
 resultado_label = ttk.Label(root, text="")

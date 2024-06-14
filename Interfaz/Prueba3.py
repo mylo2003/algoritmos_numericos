@@ -28,33 +28,32 @@ def metodo_biseccion(func, a, b, tol):
     iteraciones = 0
     errores_e_iteraciones = []
     error_actual = 100
-    
-    while error_actual > tol:
-      iteraciones += 1
-      c = (a + b) / 2.0
-      error_actual = (b - a) / 2.0
-      errores_e_iteraciones.append((iteraciones, error_actual))
-      if func(c) == 0:  # Encontramos la raíz exacta
-          break
-      if func(a) * func(c) < 0:
-          b = c
-      else:
-          a = c
-  
-      # Graficar el progreso
-      plt.plot([iteracion[0] for iteracion in errores_e_iteraciones], 
-              [error[1] for error in errores_e_iteraciones], 
-              marker='o', linestyle='-')
-      plt.xlabel('Iteraciones')
-      plt.ylabel('Error')
-      plt.title('Progreso del método de bisección')
-      plt.grid(True)
-      plt.pause(0.3)  # Pausa para que se pueda ver la gráfica
+    raices = []
 
-    plt.show()
+    while error_actual > tol:
+        iteraciones += 1
+        c = (a + b) / 2.0
+        raices.append(c)
+        error_actual = (b - a) / 2.0
+        errores_e_iteraciones.append((iteraciones, error_actual))
+        if func(c) == 0:  # Encontramos la raíz exacta
+            break
+        if func(a) * func(c) < 0:
+            b = c
+        else:
+            a = c
+    
+    # Graficar el progreso
+    plt.plot([iteracion[0] for iteracion in errores_e_iteraciones], 
+             [error[1] for error in errores_e_iteraciones], 
+             marker='o', linestyle='-')
+    plt.xlabel('Iteraciones')
+    plt.ylabel('Error')
+    plt.title('Progreso del método de bisección')
+    plt.grid(True)
     plt.tight_layout()
     
-    return c, errores_e_iteraciones
+    return c, errores_e_iteraciones, raices
 
 
 def metodo_secante(func, x0, x1, tol):
@@ -73,34 +72,32 @@ def metodo_secante(func, x0, x1, tol):
     iteraciones = 0
     errores_e_iteraciones = []
     error_actual = 100
+    raices = []
 
     while abs(error_actual) >= tol:
-      iteraciones += 1
-      if abs(func(x1) - func(x0)) < 1e-15:  # Evitar división por cero
-          messagebox.showerror("Error", "La diferencia entre f(x1) y f(x0) es muy pequeña, posible división por cero.")
-          return None
-      
-      x2 = x1 - (((x1 - x0) / (func(x1) - func(x0))) * func(x1))
+        iteraciones += 1
+        if abs(func(x1) - func(x0)) < 1e-15:  # Evitar división por cero
+            messagebox.showerror("Error", "La diferencia entre f(x1) y f(x0) es muy pequeña, posible división por cero.")
+            return None
+        
+        x2 = x1 - (((x1 - x0) / (func(x1) - func(x0))) * func(x1))
+        raices.append(x2)
+        error_actual = abs(x2 - x1)
+        errores_e_iteraciones.append((iteraciones, error_actual))
 
-      error_actual = abs(x2 - x1)
-      errores_e_iteraciones.append((iteraciones, error_actual))
-
-      x0, x1 = x1, x2
+        x0, x1 = x1, x2
     
-      # Graficar el progreso
-      plt.plot([iteracion[0] for iteracion in errores_e_iteraciones], 
-              [error[1] for error in errores_e_iteraciones], 
-              marker='o', linestyle='-')
-      plt.xlabel('Iteraciones')
-      plt.ylabel('Error')
-      plt.title('Progreso del método de la secante')
-      plt.grid(True)
-      plt.pause(0.3)  # Pausa para que se pueda ver la gráfica
-
-    plt.show()
+    # Graficar el progreso
+    plt.plot([iteracion[0] for iteracion in errores_e_iteraciones], 
+             [error[1] for error in errores_e_iteraciones], 
+             marker='o', linestyle='-')
+    plt.xlabel('Iteraciones')
+    plt.ylabel('Error')
+    plt.title('Progreso del método de la secante')
+    plt.grid(True)
     plt.tight_layout()
     
-    return x1, errores_e_iteraciones
+    return x1, errores_e_iteraciones, raices
 
 
 def metodo_newton_raphson(func, dfunc, x0, tol):
@@ -108,6 +105,7 @@ def metodo_newton_raphson(func, dfunc, x0, tol):
     errores_e_iteraciones = []
     error_actual = 100
     x_prev = x0
+    raices = []
 
     while error_actual >= tol:
         if abs(dfunc(x0)) < 1e-15:  # Evitar división por cero
@@ -115,7 +113,7 @@ def metodo_newton_raphson(func, dfunc, x0, tol):
             return None
         
         x1 = x0 - func(x0) / dfunc(x0)
-
+        raices.append(x1)
         error_actual = abs(x1 - x_prev) / abs(x1)  # Calcular el error relativo
         errores_e_iteraciones.append((iteraciones, error_actual))
 
@@ -123,20 +121,17 @@ def metodo_newton_raphson(func, dfunc, x0, tol):
         x0 = x1
         iteraciones += 1
     
-        # Graficar el progreso
-        plt.plot([iteracion[0] for iteracion in errores_e_iteraciones], 
-                [error[1] for error in errores_e_iteraciones], 
-                marker='o', linestyle='-')
-        plt.xlabel('Iteraciones')
-        plt.ylabel('Error relativo')
-        plt.title('Progreso del método de Newton-Raphson')
-        plt.grid(True)
-        plt.pause(0.3)  # Pausa para que se pueda ver la gráfica
-
-    plt.show()
+    # Graficar el progreso
+    plt.plot([iteracion[0] for iteracion in errores_e_iteraciones], 
+             [error[1] for error in errores_e_iteraciones], 
+             marker='o', linestyle='-')
+    plt.xlabel('Iteraciones')
+    plt.ylabel('Error relativo')
+    plt.title('Progreso del método de Newton-Raphson')
+    plt.grid(True)
     plt.tight_layout()
-
-    return x0, errores_e_iteraciones
+    
+    return x0, errores_e_iteraciones, raices
 
 
 def mostrar_parametros(metodo):
@@ -195,6 +190,13 @@ def calcular():
     if raiz is not None:
         resultado_label.config(text=f"La raíz aproximada es: {raiz[0]}")
 
+        # Limpiar el contenido anterior del widget de texto
+        resultados_text.delete(1.0, tk.END)
+        
+        # Añadir las iteraciones y errores al widget de texto
+        for i, (iteracion, error) in enumerate(raiz[1]):
+          resultados_text.insert(tk.END, f"I {iteracion}: Error = {error}: Raiz {raiz[2][i]}\n")
+        
         # Crear y mostrar la gráfica en la interfaz
         figure = plt.figure(figsize=(6, 4))
         canvas = FigureCanvasTkAgg(figure, master=grafica_frame)
@@ -242,7 +244,7 @@ def graficar_newton_raphson(figure, data):
             [error[1] for error in data], 
             marker='o', linestyle='-')
     ax.set_xlabel('Iteraciones')
-    ax.set_ylabel('Error')
+    ax.set_ylabel('Error relativo')
     ax.set_title('Progreso del método de Newton-Raphson')
     ax.grid(True)
     ax.tight_layout()
@@ -301,6 +303,27 @@ calcular_button.grid(row=2, column=0, padx=10, pady=10)
 # Frame para la gráfica
 grafica_frame = ttk.LabelFrame(root, text="Gráfica")
 grafica_frame.grid(row=0, column=1, rowspan=3, padx=10, pady=10, sticky="nsew")
+
+# Crear una figura vacía
+figure = plt.figure(figsize=(6, 4))
+ax = figure.add_subplot(111)
+ax.set_xlabel('Iteraciones')
+ax.set_ylabel('Error')
+ax.set_title('Progreso del método')
+ax.grid(True)
+
+# Crear un lienzo para la figura
+canvas = FigureCanvasTkAgg(figure, master=grafica_frame)
+canvas_widget = canvas.get_tk_widget()
+canvas_widget.grid(row=0, column=0, padx=5, pady=5, sticky="nsew")
+
+# Frame para los resultados por iteración
+resultados_frame = ttk.LabelFrame(root, text="Resultados por Iteración")
+resultados_frame.grid(row=0, column=2, rowspan=3, padx=10, pady=10, sticky="nsew")
+
+# Crear Treeview para mostrar los resultados
+resultados_text = tk.Text(resultados_frame, width=50, height=25)
+resultados_text.grid(row=0, column=0, padx=5, pady=5)
 
 # Resultado
 resultado_label = ttk.Label(root, text="")
